@@ -10,7 +10,7 @@ $filter = isset($_GET['filter']) ? trim($_GET['filter']) : 'all';
 $sql = "SELECT id, title, description, is_completed FROM tasks WHERE user_id = '$userId'";
 
 if ($search !== '') {
-    $sql .= " AND title LIKE '%$search%'";
+    $sql .= " AND description LIKE '%$search%'";
 }
 
 if ($filter === 'completed') {

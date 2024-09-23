@@ -87,7 +87,7 @@ function renderTasks(tasks) {
                 <span class="task-text">${task.text}</span>
             </div>
             <div class="actions">
-                <img src="images/Frame 6.svg" alt="Edit" onclick="editTask(${task.id}, '${task.title}', '${task.text}')">
+                ${task.completed ? '' : `<img src="images/Frame 6.svg" alt="Edit" onclick="editTask(${task.id}, '${task.title}', '${task.text}')">`}
                 <img src="images/trash-svgrepo-com 1.svg" alt="Delete" onclick="deleteTask(${task.id})">
             </div>
         `;
@@ -96,23 +96,31 @@ function renderTasks(tasks) {
     });
 }
 
+
 function toggleTask(id) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '../sign/update_task.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    const isChecked = document.querySelector(`input[onchange="toggleTask(${id})"]`).checked;
 
-    xhr.onload = function() {
-        if (xhr.status !== 200) {
-            alert('Ошибка обновления задачи.');
-        } else {
-            alert('Задача успешно обновлена.');
-            loadTasks();
-        }
-    };
+    if (confirm(`Вы уверены, что хотите ${isChecked ? 'завершить' : 'возобновить'} эту задачу?`)) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '../sign/update_task.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-    const data = `id=${id}&completed=${document.querySelector(`input[onchange="toggleTask(${id})"]`).checked ? 1 : 0}`;
-    xhr.send(data);
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                alert('Ошибка обновления задачи.');
+            } else {
+                alert('Задача успешно обновлена.');
+                loadTasks();
+            }
+        };
+
+        const data = `id=${id}&completed=${isChecked ? 1 : 0}`;
+        xhr.send(data);
+    } else {
+        document.querySelector(`input[onchange="toggleTask(${id})"]`).checked = !isChecked;
+    }
 }
+
 
 function editTask(id, currentTitle, currentText) {
     const newTitle = prompt('Редактировать заголовок задачи', currentTitle);
